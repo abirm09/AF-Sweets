@@ -14,7 +14,7 @@ const verifyEmailOTPSchema = new mongoose.Schema(
       type: Date,
       required: true,
       default: () => {
-        return new Date(Date.now() + 1 * 60 * 1000); // 10 minutes in the future
+        return new Date(Date.now() + 10 * 60 * 1000); // 10 minutes in the future
       },
     },
   },

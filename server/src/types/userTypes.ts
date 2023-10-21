@@ -1,4 +1,5 @@
-import express from "express";
-export interface csRes extends express.Request {
-  user: any;
+export interface IEmailData {
+  email: string;
+  subject: string;
+  html: string;
 }

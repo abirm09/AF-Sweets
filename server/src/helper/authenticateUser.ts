@@ -1,8 +1,9 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import { accessTokenSecret, clientSideHost } from "../secret";
+import { IUser } from "../model/userModel";
 
-const authenticateUser = (res: express.Response, user: any) => {
+const authenticateUser = (res: express.Response, user: IUser) => {
   const maxDate = 20;
   // token
   const token = jwt.sign(

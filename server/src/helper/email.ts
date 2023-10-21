@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { SMTPPassword, SMTPUserName } from "../secret";
+import { IEmailData } from "../types/userTypes";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -11,11 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendEmailWithNodeMailer = async (emailData: {
-  email: string;
-  subject: string;
-  html: string;
-}) => {
+export const sendEmailWithNodeMailer = async (emailData: IEmailData) => {
   try {
     const mailsOptions = {
       from: SMTPUserName,

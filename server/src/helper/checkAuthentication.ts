@@ -1,10 +1,10 @@
 import express from "express";
-import { successResponse } from "./responseHandler";
 import { accessTokenSecret } from "../secret";
 import jwt from "jsonwebtoken";
 import { handleJWTErrors } from "./handleJWTErrors";
-import User from "../model/userModel";
+import User, { IUser } from "../model/userModel";
 import { merge } from "lodash";
+import { errorResponse } from "./responseHandler";
 
 export const checkAuthentication = async (
   req: express.Request,
@@ -14,9 +14,19 @@ export const checkAuthentication = async (
   try {
     const authToken = req.cookies.__af_s_at;
     const decoded: any = jwt.verify(authToken, `${accessTokenSecret}`);
-    const user = await User.findOne({ _id: decoded.id }).select({
-      password: 0,
-    });
+    const user: IUser = await User.findOne({ _id: decoded.id }).select({});
+
+    if (!user || user.is_banned) {
+      res.cookie("__af_s_at", "", { expires: new Date(0) });
+      return errorResponse(res, { message: "No user found." });
+    }
+    if (user.email !== decoded.email) {
+      res.cookie("__af_s_at", "", { expires: new Date(0) });
+      return errorResponse(res, {
+        message: "Please login again.",
+        statusCode: 401,
+      });
+    }
     merge(req, { user });
     next();
   } catch (error: any) {

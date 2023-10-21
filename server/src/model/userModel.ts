@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    phone_number: {
+      type: String,
+      required: true,
+    },
     password: {
       type: String,
       required: true,
@@ -22,7 +26,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["owner", "seller", "user"],
     },
-    email_verified: Boolean,
+    email_verified: {
+      type: Boolean,
+      default: false,
+    },
+    is_banned: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
@@ -33,6 +44,8 @@ export interface IUser extends Document {
   profile_pic?: string;
   role?: string;
   email_verified: boolean;
+  phone_number: string;
+  is_banned: boolean;
 }
 const User: Model<IUser> = mongoose.model<IUser>("users", userSchema);
 

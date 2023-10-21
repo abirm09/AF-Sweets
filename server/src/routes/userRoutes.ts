@@ -1,10 +1,12 @@
 import express from "express";
 import validateRegister from "../validation/validateRegister";
 import {
+  changePassword,
   login,
   logout,
   profile,
   registerUser,
+  updateProfile,
   verifyEmailRequest,
   verifyUserEmail,
 } from "../controller/userController";
@@ -14,6 +16,8 @@ import { handleProfileRequest } from "../helper/handleProfileRequest";
 import VerifyUserEmailValidation from "../validation/VerifyUserEmailValidation";
 import { limitFiveTimesInTenMin } from "../middleware/limitFiveTimesInTenMin";
 import validateLogin from "../validation/loginValidation";
+import { updateProfileValidation } from "../validation/updateProfileValidation";
+import { changePasswordValidation } from "../validation/changePasswordValidation";
 const userRouter: express.Router = express.Router();
 
 /*============Register new user============*/
@@ -154,4 +158,50 @@ userRouter.post(
  *          message:"Email verified successfully."
  * **/
 
+/*============Update user============*/
+userRouter.post(
+  "/api/user/update-user",
+  updateProfileValidation,
+  runValidation,
+  checkAuthentication,
+  updateProfile
+);
+/**
+ * /api/user/update-user
+ * post:
+ *      summary:Update user profile.
+ *      description:Update user information. Send data ony want to update.
+ *      @body :
+ *        name?:""
+ *        email?:""
+ *        phone_number?:""
+ *        profile_picture?:image
+ *      @response :
+ *         200:
+ *          success:true,
+ *          message:"Profile updated successfully."
+ * **/
+
+/*============Change password============*/
+userRouter.post(
+  "/api/user/change-password",
+  checkAuthentication,
+  limitFiveTimesInTenMin,
+  changePasswordValidation,
+  runValidation,
+  changePassword
+);
+/**
+ * /api/user/change-password
+ * post:
+ *      summary:Change password.
+ *      description:Change user login password.
+ *      @body :
+ *        oldPassword:""
+ *        newPassword:""
+ *      @response :
+ *         200:
+ *          success:true,
+ *          message:"Password changed successfully."
+ * **/
 export default userRouter;

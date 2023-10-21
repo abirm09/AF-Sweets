@@ -23,8 +23,6 @@ app.use(morgan("dev"));
 app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
-app.set("trust proxy", true);
-
 // Default route
 app.get(
   "/",
