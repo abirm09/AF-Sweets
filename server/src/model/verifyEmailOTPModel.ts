@@ -18,7 +18,7 @@ const verifyEmailOTPSchema = new mongoose.Schema(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true, expires: 10 * 60 }
 );
 
 export interface IVerifyEmailOTPSchema extends Document {

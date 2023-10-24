@@ -7,5 +7,6 @@ export const userInfo = (user: IUser) => {
     phone_number: user.phone_number,
     profile_pic: user.profile_pic,
     user_role: user.role,
+    email_verified: user.email_verified,
   };
 };

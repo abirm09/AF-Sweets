@@ -3,12 +3,14 @@ import { errorResponse, successResponse } from "../helper/responseHandler";
 import User, { IUser } from "../model/userModel";
 import bcrypt from "bcryptjs";
 import authenticateUser from "../helper/authenticateUser";
-import { get, has } from "lodash";
+import { get } from "lodash";
 import otpGenerator from "otp-generator";
 import { VerifyEmailOtp } from "../model/verifyEmailOTPModel";
 import { emailVerifyOtpEmail } from "../helper/emailVerifyOtpEmail";
 import { IEmailData } from "../types/userTypes";
 import { sendEmailWithNodeMailer } from "../helper/email";
+import mongoose from "mongoose";
+import { clearCookie } from "../helper/clearCookie";
 import { userInfo } from "../helper/userPublicData";
 
 /*============Register a new user============*/
@@ -40,14 +42,7 @@ export const registerUser = async (
     });
     const user = await newUser.save();
     //Create token and send cookie
-    authenticateUser(res, user);
-    return successResponse(res, {
-      message: "User is created successfully.",
-      statusCode: 201,
-      payload: {
-        user: userInfo(user),
-      },
-    });
+    return authenticateUser(req, res, user, "User is created successfully.");
   } catch (error) {
     next(error);
   }
@@ -68,7 +63,7 @@ export const login = async (
         statusCode: 404,
       });
     if (user.is_banned) {
-      res.cookie("__af_s_at", "", { expires: new Date(0) });
+      res.cookie("__af_at", "", { expires: new Date(0) });
       return errorResponse(res, {
         message: "No user found.",
         statusCode: 404,
@@ -76,11 +71,7 @@ export const login = async (
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (passwordMatch) {
-      authenticateUser(res, user);
-      return successResponse(res, {
-        message: "User logged in successfully.",
-        payload: { user: userInfo(user) },
-      });
+      return authenticateUser(req, res, user);
     } else {
       return errorResponse(res, {
         message: "Password did not match.",
@@ -102,7 +93,7 @@ export const profile = async (
     const user = get(req, "user") as unknown as IUser;
     return successResponse(res, {
       message: "User profile info.",
-      payload: { user },
+      payload: { user: userInfo(user) },
     });
   } catch (error) {
     next(error);
@@ -116,8 +107,70 @@ export const logout = async (
   next: express.NextFunction
 ) => {
   try {
-    res.cookie("__af_s_at", "", { expires: new Date(0) });
+    clearCookie(res, "__af_at");
+    clearCookie(res, "st_af");
     return successResponse(res, { message: "Logged out user successfully." });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/*============Get total logged in devices============*/
+export const totalLoggedInDevices = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    const user = get(req, "user") as unknown as any;
+    const loggedInDevice = user.authentication.map((device: any) => {
+      return {
+        device: device.device,
+        os: device.os,
+        id: device._id,
+      };
+    });
+    return successResponse(res, {
+      message: "Total logged in devices.",
+      payload: {
+        totalLoggedInDevices: {
+          loggedInDevice,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/*============Verify email request============*/
+export const logoutFromSpecificDevice = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    const user = get(req, "user") as unknown as IUser;
+    const deviceId = req.params.deviceId;
+    if (!deviceId) {
+      return errorResponse(res, { message: "Please provide a valid id" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(deviceId)) {
+      return errorResponse(res, {
+        message: "Device id is not valid.",
+        statusCode: 400,
+      });
+    }
+
+    const updateDoc = {
+      $pull: {
+        authentication: {
+          _id: deviceId,
+        },
+      },
+    };
+    await User.findOneAndUpdate({ _id: user._id }, updateDoc);
+    return successResponse(res, { message: "Logged out success." });
   } catch (error) {
     next(error);
   }
@@ -226,9 +279,9 @@ export const updateProfile = async (
       profile_picture,
       email_verified: email ? false : undefined,
     };
-    await User.findByIdAndUpdate(user.id, updatedData);
+    await User.findByIdAndUpdate(user._id, updatedData);
     if (email) {
-      authenticateUser(res, user);
+      return authenticateUser(req, res, user);
     }
     return successResponse(res, {
       message: "Profile updated successfully.",

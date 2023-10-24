@@ -8,7 +8,7 @@ import { errorResponse } from "./responseHandler";
 import { clearCookie } from "./clearCookie";
 import deleteSessionToken from "./deleteSessionToken";
 
-export const checkAuthentication = async (
+export const checkAuthWithoutDeviceLimit = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction

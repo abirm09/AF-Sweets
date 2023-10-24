@@ -19,6 +19,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    authentication: [
+      {
+        device: String,
+        os: String,
+        token: String,
+      },
+    ],
     profile_pic: {
       type: String,
     },
@@ -41,6 +48,13 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  authentication: [
+    {
+      device: string;
+      os: string;
+      token: string;
+    }
+  ];
   profile_pic?: string;
   role?: string;
   email_verified: boolean;

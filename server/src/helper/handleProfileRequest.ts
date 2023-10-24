@@ -7,9 +7,9 @@ export const handleProfileRequest = async (
   next: express.NextFunction
 ) => {
   try {
-    if (!req.cookies.__af_s_at) {
+    if (!req.cookies.__af_at) {
       return errorResponse(res, {
-        message: "Unauthenticated user.",
+        message: "Unauthorized user.",
         statusCode: 400,
         payload: { user: null },
       });

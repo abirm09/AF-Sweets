@@ -4,8 +4,10 @@ import {
   changePassword,
   login,
   logout,
+  logoutFromSpecificDevice,
   profile,
   registerUser,
+  totalLoggedInDevices,
   updateProfile,
   verifyEmailRequest,
   verifyUserEmail,
@@ -18,6 +20,7 @@ import { limitFiveTimesInTenMin } from "../middleware/limitFiveTimesInTenMin";
 import validateLogin from "../validation/loginValidation";
 import { updateProfileValidation } from "../validation/updateProfileValidation";
 import { changePasswordValidation } from "../validation/changePasswordValidation";
+import { checkAuthWithoutDeviceLimit } from "../helper/checkAuthWithoutDeviceLimit";
 const userRouter: express.Router = express.Router();
 
 /*============Register new user============*/
@@ -63,7 +66,7 @@ userRouter.post(
  *      @response :
  *         200:
  *          success:true,
- *          message:"Logged in successfully."
+ *          message:"Logged in successful."
  * **/
 
 /*============Get user profile============*/
@@ -100,7 +103,7 @@ userRouter.get(
  *         if user is @not authenticated
  *         400:
  *         "success": false,
- *         "error": "Unauthenticated user.",
+ *         "error": "Unauthorized user.",
  *         "payload": {
  *              "user": null
  *          }
@@ -119,6 +122,41 @@ userRouter.post("/api/user/logout", logout);
  *          success:true,
  *          message:"Logged out user successfully."
  * **/
+
+/*============Get total logged in devices============*/
+userRouter.get(
+  "/api/user/total-logged-in-devices",
+  checkAuthWithoutDeviceLimit,
+  totalLoggedInDevices
+);
+/**
+ * /api/user/total-logged-in-devices
+ * post:
+ *      summary:Total logged in devices.
+ *      description:Get an users total logged in devices.
+ *      @response :
+ *         200:
+ *          success:true,
+ *          message:"Total logged in devices."
+ *          payload:
+ *            {
+ *                "device": "",
+ *                "os": "",
+ *                "id": ""
+ *              },
+ *              {
+ *                "device": "",
+ *                "os": "",
+ *                "id": ""
+ *              },
+ * **/
+
+/*============Logout from a specific device============*/
+userRouter.post(
+  "/api/user/logout/:deviceId",
+  checkAuthWithoutDeviceLimit,
+  logoutFromSpecificDevice
+);
 
 /*============Email verification request============*/
 userRouter.post(

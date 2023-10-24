@@ -7,6 +7,8 @@ import morgan from "morgan";
 import { clientSideUrl } from "./secret";
 import { errorResponse, successResponse } from "./helper/responseHandler";
 import userRouter from "./routes/userRoutes";
+import sweetsRoutes from "./routes/sweetsRoutes";
+import userAgent from "express-useragent";
 export const app = express();
 
 // cors config
@@ -23,6 +25,7 @@ app.use(morgan("dev"));
 app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
+app.use(userAgent.express());
 // Default route
 app.get(
   "/",
@@ -32,6 +35,7 @@ app.get(
     next: express.NextFunction
   ) => {
     try {
+      console.log(req.useragent);
       return successResponse(res, {
         message: "Server is running successfully.",
       });
@@ -44,6 +48,7 @@ app.get(
 /*==========API routes starts here=========*/
 
 app.use(userRouter);
+app.use(sweetsRoutes);
 
 /*==========API routes ends here===========*/
 
