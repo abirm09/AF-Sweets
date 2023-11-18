@@ -12,20 +12,20 @@ import userAgent from "express-useragent";
 export const app = express();
 
 // cors config
-const corsConfig = {
+const corsOptions = {
   origin: clientSideUrl,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
+  credentials: true, // This is important for cookies to work
 };
 
 // Middleware
-app.use(cors(corsConfig));
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(helmet());
+app.use(express.json());
 app.use(morgan("dev"));
 app.use(compression());
-app.use(express.json());
-app.use(cookieParser());
 app.use(userAgent.express());
+
 // Default route
 app.get(
   "/",
@@ -35,7 +35,6 @@ app.get(
     next: express.NextFunction
   ) => {
     try {
-      console.log(req.useragent);
       return successResponse(res, {
         message: "Server is running successfully.",
       });

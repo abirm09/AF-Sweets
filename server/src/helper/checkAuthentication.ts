@@ -20,6 +20,7 @@ export const checkAuthentication = async (
     // check tokens
     if (!authToken && sessionToken) {
       clearCookie(res, "st_af");
+      clearCookie(res, "authenticated");
       await deleteSessionToken(sessionToken);
       return errorResponse(res, {
         message: "Unauthorized",
@@ -27,6 +28,7 @@ export const checkAuthentication = async (
       });
     } else if (authToken && !sessionToken) {
       clearCookie(res, "__af_at");
+      clearCookie(res, "authenticated");
       return errorResponse(res, {
         message: "Unauthorized",
         statusCode: 401,
@@ -46,6 +48,7 @@ export const checkAuthentication = async (
           // find the token and delete
           clearCookie(res, "__af_at");
           clearCookie(res, "st_af");
+          clearCookie(res, "authenticated");
           await deleteSessionToken(sessionToken);
           return handleJWTErrors(res, err, next);
         }
@@ -58,11 +61,12 @@ export const checkAuthentication = async (
         if (!user || user.is_banned) {
           clearCookie(res, "__af_at");
           clearCookie(res, "st_af");
+          clearCookie(res, "authenticated");
           return errorResponse(res, { message: "No user found." });
         }
 
         // handle if user logged in more than 3 device
-        if (user.authentication.length >= 4) {
+        if ((user?.authentication?.length as number) >= 4) {
           return errorResponse(res, {
             message: "Device limit.",
             statusCode: 400,

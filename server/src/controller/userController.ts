@@ -12,6 +12,7 @@ import { sendEmailWithNodeMailer } from "../helper/email";
 import mongoose from "mongoose";
 import { clearCookie } from "../helper/clearCookie";
 import { userInfo } from "../helper/userPublicData";
+import deleteSessionToken from "../helper/deleteSessionToken";
 
 /*============Register a new user============*/
 // TODO: Make picture upload system
@@ -21,7 +22,7 @@ export const registerUser = async (
   next: express.NextFunction
 ) => {
   try {
-    const { name, email, password, phone_number } = req.body;
+    const { name, email, password, phone_number, profile_pic } = req.body;
     const isAlreadyExist = await User.findOne({ email });
     if (isAlreadyExist)
       return errorResponse(res, {
@@ -36,7 +37,7 @@ export const registerUser = async (
       email,
       password: hash,
       email_verified: false,
-      profile_pic: null, //TODO: change with actual url.
+      profile_pic: profile_pic ? profile_pic : null,
       role: "user",
       phone_number,
     });
@@ -69,7 +70,10 @@ export const login = async (
         statusCode: 404,
       });
     }
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.password as string
+    );
     if (passwordMatch) {
       return authenticateUser(req, res, user);
     } else {
@@ -91,6 +95,7 @@ export const profile = async (
 ) => {
   try {
     const user = get(req, "user") as unknown as IUser;
+    // req.user
     return successResponse(res, {
       message: "User profile info.",
       payload: { user: userInfo(user) },
@@ -107,8 +112,11 @@ export const logout = async (
   next: express.NextFunction
 ) => {
   try {
-    clearCookie(res, "__af_at");
+    const sessionToken = req.cookies.st_af;
+    await deleteSessionToken(sessionToken);
     clearCookie(res, "st_af");
+    clearCookie(res, "authenticated");
+    clearCookie(res, "__af_at");
     return successResponse(res, { message: "Logged out user successfully." });
   } catch (error) {
     next(error);
@@ -196,7 +204,10 @@ export const verifyEmailRequest = async (
       lowerCaseAlphabets: false,
     });
     try {
-      const emailData: IEmailData = emailVerifyOtpEmail(user.email, otp);
+      const emailData: IEmailData = emailVerifyOtpEmail(
+        user.email as string,
+        otp
+      );
       await sendEmailWithNodeMailer(emailData);
     } catch (error) {
       return errorResponse(res, {
@@ -281,7 +292,7 @@ export const updateProfile = async (
     };
     await User.findByIdAndUpdate(user._id, updatedData);
     if (email) {
-      return authenticateUser(req, res, user);
+      return authenticateUser(req, res, user, "Profile updated successfully.");
     }
     return successResponse(res, {
       message: "Profile updated successfully.",
@@ -301,7 +312,10 @@ export const changePassword = async (
   try {
     const { oldPassword, newPassword } = req.body;
     const user = get(req, "user") as unknown as IUser;
-    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+    const passwordMatch = await bcrypt.compare(
+      oldPassword,
+      user.password as string
+    );
     if (!passwordMatch) {
       return errorResponse(res, {
         message: "Old password didn't match.",

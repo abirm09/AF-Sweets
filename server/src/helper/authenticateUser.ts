@@ -1,11 +1,11 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import { accessTokenSecret } from "../secret";
+import { accessTokenSecret, clientSideHost } from "../secret";
 import User, { IUser } from "../model/userModel";
 import { successResponse } from "./responseHandler";
 import crypto from "crypto";
-import { sendSecureCookie } from "./sendSecureCookie";
 import { userInfo } from "./userPublicData";
+import { sendCookie } from "./sendCookie";
 
 const authenticateUser = async (
   req: any,
@@ -41,11 +41,10 @@ const authenticateUser = async (
     expirationDate.setDate(expirationDate.getDate() + maxDate);
     //send cookie
     // __af_at = Adi fakir access token
-    sendSecureCookie(res, "__af_at", token, expirationDate);
-
+    sendCookie(res, "__af_at", token, expirationDate);
     // st_af = session token adi fakir
-    sendSecureCookie(res, "st_af", sessionToken, expirationDate);
-
+    sendCookie(res, "st_af", sessionToken, expirationDate);
+    sendCookie(res, "authenticated", "true", expirationDate, false, true);
     return successResponse(res, { message, payload: { user: userInfo(user) } });
   } catch (error) {
     throw error;

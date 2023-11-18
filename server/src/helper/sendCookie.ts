@@ -1,17 +1,19 @@
 import express from "express";
 import { clientSideHost } from "../secret";
-export const sendSecureCookie = (
+export const sendCookie = (
   res: express.Response,
   fieldName: string,
   value: string,
-  expirationDate: Date
+  expirationDate: Date,
+  httpOnly: boolean = true,
+  secure: boolean = true
 ) => {
   return res.cookie(fieldName, value, {
-    // domain: clientSideHost, // TODO: Uncomment before deploy.
+    domain: clientSideHost,
     path: "/",
-    httpOnly: true,
+    httpOnly,
     sameSite: "none",
-    secure: true,
+    secure,
     expires: expirationDate,
   });
 };

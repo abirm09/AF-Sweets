@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-export const PORT = process.env.PORT;
+export const PORT = process.env.PORT || 5000;
 export const clientSideUrl = process.env.CLIENT_SIDE_URL;
 export const clientSideHost = process.env.CLIENT_SIDE_HOST;
 export const DBUrl = process.env.DBUrl;

@@ -14,6 +14,7 @@ const sweetSchema = new mongoose.Schema(
       price: Number,
       price_updates: [
         {
+          price: Number,
           user_id: String,
           updatedAt: {
             type: Date,
@@ -37,6 +38,7 @@ export interface ISweet extends Document {
     price: Number;
     price_updates: [
       {
+        price: Number;
         user_id: String;
         updatedAt: Date;
       }

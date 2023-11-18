@@ -28,6 +28,14 @@ const userSchema = new mongoose.Schema(
     ],
     profile_pic: {
       type: String,
+      validate: {
+        validator: function (value: any) {
+          // Allow 'null' or 'string' values
+          return value === null || typeof value === "string";
+        },
+        message: "Field must be a string or null.",
+      },
+      default: null,
     },
     role: {
       type: String,
@@ -45,21 +53,21 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 export interface IUser extends Document {
-  name: string;
-  email: string;
-  password: string;
-  authentication: [
+  name?: string;
+  email?: string;
+  password?: string;
+  authentication?: [
     {
-      device: string;
-      os: string;
-      token: string;
+      device?: string;
+      os?: string;
+      token?: string;
     }
   ];
   profile_pic?: string;
   role?: string;
-  email_verified: boolean;
-  phone_number: string;
-  is_banned: boolean;
+  email_verified?: boolean;
+  phone_number?: string;
+  is_banned?: boolean;
 }
 const User: Model<IUser> = mongoose.model<IUser>("users", userSchema);
 

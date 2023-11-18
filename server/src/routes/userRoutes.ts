@@ -14,7 +14,6 @@ import {
 } from "../controller/userController";
 import runValidation from "../validation/runValidation";
 import { checkAuthentication } from "../helper/checkAuthentication";
-import { handleProfileRequest } from "../helper/handleProfileRequest";
 import VerifyUserEmailValidation from "../validation/VerifyUserEmailValidation";
 import { limitFiveTimesInTenMin } from "../middleware/limitFiveTimesInTenMin";
 import validateLogin from "../validation/loginValidation";
@@ -26,7 +25,7 @@ const userRouter: express.Router = express.Router();
 /*============Register new user============*/
 userRouter.post(
   "/api/user/register",
-  limitFiveTimesInTenMin,
+  // limitFiveTimesInTenMin,
   validateRegister,
   runValidation,
   registerUser
@@ -50,7 +49,7 @@ userRouter.post(
 /*============Login a user============*/
 userRouter.post(
   "/api/user/login",
-  limitFiveTimesInTenMin,
+  // limitFiveTimesInTenMin,
   validateLogin,
   runValidation,
   login
@@ -70,12 +69,7 @@ userRouter.post(
  * **/
 
 /*============Get user profile============*/
-userRouter.get(
-  "/api/user/profile",
-  handleProfileRequest,
-  checkAuthentication,
-  profile
-);
+userRouter.get("/api/user/profile", checkAuthWithoutDeviceLimit, profile);
 /**
  * /api/user/profile
  * get:
@@ -94,9 +88,6 @@ userRouter.get(
  *            "profile_pic": "",
  *            "role": "",
  *            "email_verified": boolean,
- *            "createdAt": "2023-10-18T03:58:05.592Z",
- *            "updatedAt": "2023-10-18T03:58:05.592Z",
- *            "__v": 0
  *             }
  *          }
  *
@@ -157,6 +148,19 @@ userRouter.post(
   checkAuthWithoutDeviceLimit,
   logoutFromSpecificDevice
 );
+/**
+ * /api/user/logout/:deviceId
+ * post:
+ *      summary:Logout from a specific device.
+ *      description:Logout from a specific device.
+ *      @response :
+ *         200:
+ *          success:true,
+ *          message:"Total logged in devices."
+ *          payload:
+ *            success:false,
+ *            message:"Logout success."
+ * **/
 
 /*============Email verification request============*/
 userRouter.post(
@@ -197,7 +201,7 @@ userRouter.post(
  * **/
 
 /*============Update user============*/
-userRouter.post(
+userRouter.put(
   "/api/user/update-user",
   updateProfileValidation,
   runValidation,
@@ -206,7 +210,7 @@ userRouter.post(
 );
 /**
  * /api/user/update-user
- * post:
+ * put:
  *      summary:Update user profile.
  *      description:Update user information. Send data ony want to update.
  *      @body :
@@ -221,7 +225,7 @@ userRouter.post(
  * **/
 
 /*============Change password============*/
-userRouter.post(
+userRouter.put(
   "/api/user/change-password",
   checkAuthentication,
   limitFiveTimesInTenMin,
