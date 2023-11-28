@@ -9,6 +9,7 @@ import { errorResponse, successResponse } from "./helper/responseHandler";
 import userRouter from "./routes/userRoutes";
 import sweetsRoutes from "./routes/sweetsRoutes";
 import userAgent from "express-useragent";
+import salesRoute from "./routes/salesRoutes";
 export const app = express();
 
 // cors config
@@ -48,6 +49,7 @@ app.get(
 
 app.use(userRouter);
 app.use(sweetsRoutes);
+app.use(salesRoute);
 
 /*==========API routes ends here===========*/
 

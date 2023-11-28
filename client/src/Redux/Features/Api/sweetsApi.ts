@@ -12,7 +12,15 @@ const sweetApi = baseApi.injectEndpoints({
     allSweets: builder.query({
       query: () => "/api/sweets/all-sweets-info",
     }),
+    addSale: builder.mutation({
+      query: body => ({
+        url: "/api/sales/add-sales",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useAddNewSweetMutation, useAllSweetsQuery } = sweetApi;
+export const { useAddNewSweetMutation, useAllSweetsQuery, useAddSaleMutation } =
+  sweetApi;

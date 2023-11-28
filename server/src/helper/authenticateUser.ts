@@ -29,7 +29,7 @@ const authenticateUser = async (
     const doc = {
       $push: {
         authentication: {
-          device: req.useragent.browser,
+          browser: req.useragent.browser,
           os: req.useragent.os,
           token: sessionToken,
         },

@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
     },
     authentication: [
       {
-        device: String,
+        browser: String,
         os: String,
         token: String,
       },

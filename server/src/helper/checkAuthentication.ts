@@ -1,5 +1,5 @@
 import express from "express";
-import { accessTokenSecret } from "../secret";
+import { accessTokenSecret, clientSideUrl } from "../secret";
 import jwt from "jsonwebtoken";
 import { handleJWTErrors } from "./handleJWTErrors";
 import User, { IUser } from "../model/userModel";
@@ -64,16 +64,16 @@ export const checkAuthentication = async (
           clearCookie(res, "authenticated");
           return errorResponse(res, { message: "No user found." });
         }
-
         // handle if user logged in more than 3 device
         if ((user?.authentication?.length as number) >= 4) {
+          console.log(`${clientSideUrl}/login-activity`);
           return errorResponse(res, {
             message: "Device limit.",
             statusCode: 400,
           });
         }
 
-        merge(req, { user });
+        merge(req, { user, sessionToken });
         next();
       }
     );

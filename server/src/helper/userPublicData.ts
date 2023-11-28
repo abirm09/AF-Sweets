@@ -1,4 +1,5 @@
 import { IUser } from "../model/userModel";
+import settings from "../setting/settings.json";
 
 export const userInfo = (user: IUser) => {
   return {
@@ -8,5 +9,6 @@ export const userInfo = (user: IUser) => {
     profile_pic: user.profile_pic,
     user_role: user.role,
     email_verified: user.email_verified,
+    max_discount: settings.discount_price,
   };
 };

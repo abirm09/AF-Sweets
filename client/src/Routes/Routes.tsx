@@ -8,12 +8,18 @@ import StaffOrOwnerRoute from "../Layouts/PrivateRoute/StaffOrOwnerRoute";
 import Analytics from "../Pages/Manage/Analytics/Analytics";
 import AddSales from "../Pages/Manage/AddSales/AddSales";
 import AddNewSweet from "../Pages/Manage/AddNewSweet/AddNewSweet";
+import LoginActivity from "../Pages/Main/LoginActivity/LoginActivity";
 
 export const routes = createBrowserRouter([
   {
     path: "/",
     element: <Main />,
-    children: [],
+    children: [
+      {
+        path: "login-activity",
+        element: <LoginActivity />,
+      },
+    ],
   },
   {
     path: "/manage",

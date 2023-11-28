@@ -66,6 +66,4 @@ sweetsRoutes.get("/api/sweets/all-sweets-info", allSweetInfo);
  *          }
  * **/
 
-/*============Get single sweet info by id============*/
-
 export default sweetsRoutes;

@@ -30,7 +30,6 @@ const SelectSingleSweet = ({
 }: ISelectSingleSweet) => {
   const [selectedSweet, setSelectedSweet] = React.useState<ISweetInfo>({});
   const [unit, setUnit] = React.useState(1);
-
   //handle sweet change
   const handleSweetChange = (e: string | undefined) => {
     const findSelectedSweet = allSweetsInfo.find(item => item?._id === e);
@@ -54,12 +53,15 @@ const SelectSingleSweet = ({
 
   // handle unit change
   const handleUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = parseFloat(e.target.value);
+    if (isNaN(value)) {
+      value = 0;
+    }
     const exceptCurrent = addedSweets.filter(item => item._id !== sweet._id);
-    sweet.unit = parseFloat(e.target.value);
-    sweet.cost =
-      (selectedSweet?.price_info?.price ?? 0) * parseFloat(e.target.value);
+    sweet.unit = value;
+    sweet.cost = (selectedSweet?.price_info?.price ?? 0) * value;
     setAddedSweets([...exceptCurrent, sweet]);
-    setUnit(parseFloat(e.target.value));
+    setUnit(value);
   };
 
   // handle remove a sweet

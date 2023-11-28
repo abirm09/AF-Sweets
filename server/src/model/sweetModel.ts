@@ -1,6 +1,20 @@
 import mongoose, { Document, Model } from "mongoose";
-
-const sweetSchema = new mongoose.Schema(
+export interface ISweet extends Document {
+  name: string;
+  image: string;
+  price_info: {
+    price: Number;
+    price_updates: [
+      {
+        price: Number;
+        user_id: String;
+        updatedAt: Date;
+      }
+    ];
+  };
+  is_alive: boolean;
+}
+const sweetSchema = new mongoose.Schema<ISweet>(
   {
     name: {
       type: String,
@@ -30,22 +44,6 @@ const sweetSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-export interface ISweet extends Document {
-  name: string;
-  image: string;
-  price_info: {
-    price: Number;
-    price_updates: [
-      {
-        price: Number;
-        user_id: String;
-        updatedAt: Date;
-      }
-    ];
-  };
-  is_alive: boolean;
-}
 
 export const Sweet: Model<ISweet> = mongoose.model<ISweet>(
   "Sweets",
